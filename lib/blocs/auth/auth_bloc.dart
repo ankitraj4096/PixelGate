@@ -14,24 +14,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
 
-    // Simulate API call delay
+    // Simulate API call delay for better UX
     await Future.delayed(const Duration(seconds: 1));
 
-    // Hardcoded credentials for demonstration
-    const String validEmail = "test@example.com";
-    const String validPassword = "Test@123";
+    // **LOGIC CHANGE IS HERE**:
+    // The hardcoded credential check has been removed.
+    // The UI's Form validation already ensures the email and password meet the required format.
+    // Therefore, if this event is received, we can proceed directly to the success state
+    // to fulfill the requirement of letting any validly formatted credential log in.
 
-    if (event.email == validEmail && event.password == validPassword) {
-      emit(AuthSuccess(email: event.email));
-    } else {
-      emit(const AuthFailure(error: "Invalid email or password"));
-    }
+    emit(AuthSuccess(email: event.email));
   }
 
   Future<void> _onLogoutRequested(
     LogoutRequested event,
     Emitter<AuthState> emit,
   ) async {
+    // This part remains unchanged.
     emit(AuthInitial());
   }
 }

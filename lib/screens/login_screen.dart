@@ -7,7 +7,7 @@ import '../widgets/custom_text_field.dart'; // Assuming this path is correct
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key}); // Added super.key for best practice
+  const LoginScreen({super.key});
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -29,12 +29,10 @@ class _LoginScreenState extends State<LoginScreen> {
     if (value == null || value.isEmpty) {
       return 'Email is required';
     }
-    
     final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
     if (!emailRegex.hasMatch(value)) {
       return 'Please enter a valid email address';
     }
-    
     return null;
   }
 
@@ -42,27 +40,21 @@ class _LoginScreenState extends State<LoginScreen> {
     if (value == null || value.isEmpty) {
       return 'Password is required';
     }
-    
     if (value.length < 8) {
       return 'Password must be at least 8 characters long';
     }
-    
     if (!RegExp(r'[A-Z]').hasMatch(value)) {
-      return 'Password must contain at least one uppercase letter';
+      return 'Password must contain an uppercase letter';
     }
-    
     if (!RegExp(r'[a-z]').hasMatch(value)) {
-      return 'Password must contain at least one lowercase letter';
+      return 'Password must contain a lowercase letter';
     }
-    
     if (!RegExp(r'[0-9]').hasMatch(value)) {
-      return 'Password must contain at least one numeric digit';
+      return 'Password must contain a number';
     }
-    
     if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(value)) {
-      return 'Password must contain at least one symbol';
+      return 'Password must contain a symbol';
     }
-    
     return null;
   }
 
@@ -84,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
         listener: (context, state) {
           if (state is AuthSuccess) {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) =>  HomeScreen()), // Made HomeScreen const
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
             );
           } else if (state is AuthFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -95,130 +87,158 @@ class _LoginScreenState extends State<LoginScreen> {
             );
           }
         },
-        child: SafeArea(
-          // **THE FIX IS HERE**: Wrapped the Padding with SingleChildScrollView
-          // This allows the content to scroll when the keyboard is open.
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Added a spacer to better center content on taller screens
-                    const SizedBox(height: 40),
-                    const Text(
-                      'Welcome Back!',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Please sign in to continue',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 48),
-                    
-                    CustomTextField(
-                      label: 'Email',
-                      hint: 'Enter your email',
-                      controller: _emailController,
-                      validator: _validateEmail,
-                    ),
-                    
-                    const SizedBox(height: 24),
-                    
-                    CustomTextField(
-                      label: 'Password',
-                      hint: 'Enter your password',
-                      isPassword: true,
-                      controller: _passwordController,
-                      validator: _validatePassword,
-                    ),
-                    
-                    const SizedBox(height: 32),
-                    
-                    BlocBuilder<AuthBloc, AuthState>(
-                      builder: (context, state) {
-                        return ElevatedButton(
-                          onPressed: state is AuthLoading ? null : _submitForm,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.blue, Colors.white],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: [0.0, 0.7],
+            ),
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const SizedBox(height: 80),
+                            const Icon(
+                              Icons.lock_open_rounded,
+                              size: 100,
+                              color: Colors.white,
                             ),
-                          ),
-                          child: state is AuthLoading
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
+                            const SizedBox(height: 20),
+                            const Text(
+                              'Welcome User',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Please sign in to continue',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white.withOpacity(0.9),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 48),
+                            TextFormField(
+                              controller: _emailController,
+                              validator: _validateEmail,
+                              decoration: _buildInputDecoration('Email', Icons.email_outlined),
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                            const SizedBox(height: 24),
+                            TextFormField(
+                              controller: _passwordController,
+                              validator: _validatePassword,
+                              obscureText: true,
+                              decoration: _buildInputDecoration('Password', Icons.lock_outline),
+                            ),
+                            const SizedBox(height: 32),
+                            BlocBuilder<AuthBloc, AuthState>(
+                              builder: (context, state) {
+                                return ElevatedButton(
+                                  onPressed: state is AuthLoading ? null : _submitForm,
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                        if (states.contains(MaterialState.hovered)) {
+                                          return Colors.blue.shade800; // Darker hover color
+                                        }
+                                        return Colors.blue.shade700; // Default color
+                                      },
                                     ),
+                                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                                    padding: MaterialStateProperty.all(const EdgeInsets.symmetric(vertical: 16)),
+                                    shape: MaterialStateProperty.all(
+                                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    ),
+                                    elevation: MaterialStateProperty.all(5),
                                   ),
-                                )
-                              : const Text(
-                                  'Login',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                        );
-                      },
-                    ),
-                    
-                    const SizedBox(height: 24),
-                    
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.blue.shade200),
-                      ),
-                      child: const Column(
-                        children: [
-                          Text(
-                            'Demo Credentials:',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: Colors.blue,
+                                  child: state is AuthLoading
+                                      ? const SizedBox(
+                                          height: 24,
+                                          width: 24,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 3,
+                                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                          ),
+                                        )
+                                      : const Text(
+                                          'LOGIN',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 1.5,
+                                          ),
+                                        ),
+                                );
+                              },
                             ),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Email: test@example.com',
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                          Text(
-                            'Password: Test@123',
-                            style: TextStyle(color: Colors.blue),
-                          ),
-                        ],
+                            // **THE CHANGE IS HERE**: Added the instructional text below the button.
+                            const SizedBox(height: 24),
+                            Text(
+                              'Enter any valid email and password to login.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade700,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                     const SizedBox(height: 20), // Added spacing at the bottom
-                  ],
+                  ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  child: Text(
+                    '© 2025 PixelGate. All Rights Reserved.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  InputDecoration _buildInputDecoration(String label, IconData prefixIcon) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(color: Colors.blue.shade700),
+      prefixIcon: Icon(prefixIcon, color: Colors.blue.shade700),
+      filled: true,
+      fillColor: Colors.white.withOpacity(0.9),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.blue.shade700, width: 2),
       ),
     );
   }
