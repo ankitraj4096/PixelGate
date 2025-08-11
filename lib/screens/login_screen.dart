@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/auth/auth_bloc.dart';
 import '../blocs/auth/auth_event.dart';
 import '../blocs/auth/auth_state.dart';
-import '../widgets/custom_text_field.dart';
+import '../widgets/custom_text_field.dart'; // Assuming this path is correct
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key}); // Added super.key for best practice
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -67,11 +69,11 @@ class _LoginScreenState extends State<LoginScreen> {
   void _submitForm() {
     if (_formKey.currentState?.validate() ?? false) {
       context.read<AuthBloc>().add(
-        LoginRequested(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        ),
-      );
+            LoginRequested(
+              email: _emailController.text.trim(),
+              password: _passwordController.text,
+            ),
+          );
     }
   }
 
@@ -82,7 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
         listener: (context, state) {
           if (state is AuthSuccess) {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => HomeScreen()),
+              MaterialPageRoute(builder: (context) =>  HomeScreen()), // Made HomeScreen const
             );
           } else if (state is AuthFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -94,118 +96,125 @@ class _LoginScreenState extends State<LoginScreen> {
           }
         },
         child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text(
-                    'Welcome Back!',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+          // **THE FIX IS HERE**: Wrapped the Padding with SingleChildScrollView
+          // This allows the content to scroll when the keyboard is open.
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Added a spacer to better center content on taller screens
+                    const SizedBox(height: 40),
+                    const Text(
+                      'Welcome Back!',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Please sign in to continue',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Please sign in to continue',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 48),
-                  
-                  CustomTextField(
-                    label: 'Email',
-                    hint: 'Enter your email',
-                    controller: _emailController,
-                    validator: _validateEmail,
-                  ),
-                  
-                  const SizedBox(height: 24),
-                  
-                  CustomTextField(
-                    label: 'Password',
-                    hint: 'Enter your password',
-                    isPassword: true,
-                    controller: _passwordController,
-                    validator: _validatePassword,
-                  ),
-                  
-                  const SizedBox(height: 32),
-                  
-                  BlocBuilder<AuthBloc, AuthState>(
-                    builder: (context, state) {
-                      return ElevatedButton(
-                        onPressed: state is AuthLoading ? null : _submitForm,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                    const SizedBox(height: 48),
+                    
+                    CustomTextField(
+                      label: 'Email',
+                      hint: 'Enter your email',
+                      controller: _emailController,
+                      validator: _validateEmail,
+                    ),
+                    
+                    const SizedBox(height: 24),
+                    
+                    CustomTextField(
+                      label: 'Password',
+                      hint: 'Enter your password',
+                      isPassword: true,
+                      controller: _passwordController,
+                      validator: _validatePassword,
+                    ),
+                    
+                    const SizedBox(height: 32),
+                    
+                    BlocBuilder<AuthBloc, AuthState>(
+                      builder: (context, state) {
+                        return ElevatedButton(
+                          onPressed: state is AuthLoading ? null : _submitForm,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
-                        ),
-                        child: state is AuthLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
+                          child: state is AuthLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : const Text(
+                                  'Login',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                              )
-                            : const Text(
-                                'Login',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                      );
-                    },
-                  ),
-                  
-                  const SizedBox(height: 24),
-                  
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue.shade200),
+                        );
+                      },
                     ),
-                    child: const Column(
-                      children: [
-                        Text(
-                          'Demo Credentials:',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: Colors.blue,
+                    
+                    const SizedBox(height: 24),
+                    
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.blue.shade200),
+                      ),
+                      child: const Column(
+                        children: [
+                          Text(
+                            'Demo Credentials:',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.blue,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Email: test@example.com',
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                        Text(
-                          'Password: Test@123',
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                      ],
+                          SizedBox(height: 8),
+                          Text(
+                            'Email: test@example.com',
+                            style: TextStyle(color: Colors.blue),
+                          ),
+                          Text(
+                            'Password: Test@123',
+                            style: TextStyle(color: Colors.blue),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                     const SizedBox(height: 20), // Added spacing at the bottom
+                  ],
+                ),
               ),
             ),
           ),
